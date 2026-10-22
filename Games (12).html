@@ -1,4 +1,4 @@
-<!-- https://discord.gg/ujMnFfP9Jr -->
+
 <html lang="en"><head>
 <script>
 (function() {
@@ -34,11 +34,14 @@
 
 <style>
   :root {
+    --theme-hue: 186;
     --bg-color: #000000;
-    --card-bg: #1C2526;
+    --card-bg: hsl(var(--theme-hue), 16%, 13%);
     --text-main: #ffffff;
     --text-dim: #94a3b8;
-    --accent-glow: linear-gradient(135deg, #ff416c, #4facfe);
+    --accent-glow: linear-gradient(135deg, hsl(calc(var(--theme-hue) - 145), 100%, 61%), hsl(var(--theme-hue), 97%, 66%));
+    --border-dim: rgba(148, 163, 184, 0.16);
+    --border-hover: rgba(148, 163, 184, 0.5);
   }
 
   body {
@@ -97,7 +100,7 @@
     border-radius: 15px;
     padding: 20px;
     text-align: center;
-    border: 2px solid rgba(148, 163, 184, 0.16);
+    border: 2px solid var(--border-dim);
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
@@ -107,7 +110,7 @@
 
   .card:hover, .card:focus {
     transform: translateY(-3px);
-    border-color: rgba(148, 163, 184, 0.5);
+    border-color: var(--border-hover);
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
   }
 
@@ -180,7 +183,6 @@
     flex-shrink: 0;
   }
 
-  /* Game viewer icon buttons — match .nav-icon-btn style */
   .fg-btn {
     display: inline-flex;
     align-items: center;
@@ -188,8 +190,8 @@
     width: 42px;
     height: 42px;
     border-radius: 12px;
-    background: #1C2526;
-    border: 2px solid rgba(148,163,184,0.16);
+    background: var(--card-bg);
+    border: 2px solid var(--border-dim);
     cursor: pointer;
     transition: border-color 0.2s, transform 0.2s, background 0.2s;
     flex-shrink: 0;
@@ -198,7 +200,7 @@
     padding: 0;
   }
   .fg-btn:hover {
-    border-color: rgba(148,163,184,0.5);
+    border-color: var(--border-hover);
     transform: translateY(-2px);
   }
   .fg-btn:focus, .fg-btn:active, .fg-btn:focus-visible {
@@ -211,14 +213,11 @@
     display: block;
   }
 
-  /* Favourite active state */
   .fg-btn-fav.active {
     border-color: rgba(245,197,24,0.5);
     background: rgba(245,197,24,0.08);
   }
   .fg-btn-fav.active img { filter: sepia(1) saturate(4) hue-rotate(5deg) brightness(1.1); }
-
-  /* Close button — no special red styling, same as other buttons */
 
   #fg-game-area {
     flex: 1;
@@ -233,9 +232,6 @@
     display: block;
   }
 
-
-
-  /* Video loading screen: load only when a game is opened */
   #fg-loading {
     position: absolute;
     inset: 0;
@@ -255,7 +251,6 @@
   #fg-loading-video {
     width: 100%;
     height: 100%;
-    /* Fit the entire video frame so text near the edges is never cropped. */
     object-fit: contain;
     object-position: center;
     filter: none;
@@ -310,10 +305,277 @@
   .fg-console-line.warn { color: #f0c674; }
   .fg-console-line.error { color: #ff8b8b; }
 
-
-  /* Favourited card highlight */
   .card.fav-card {
     border-color: rgba(245, 197, 24, 0.4);
+  }
+
+  /* ─── NAV ICON BUTTONS ─── */
+  .nav-icon-btn {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-dim);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  button.nav-icon-btn {
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    appearance: none;
+  }
+  .nav-icon-btn:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+  .nav-icon-btn img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+  }
+
+  /* ─── SETTINGS PANEL ─── */
+  #settings-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    pointer-events: none;
+  }
+  #settings-panel.open {
+    transform: translateY(0);
+    pointer-events: all;
+  }
+  #settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 56px;
+    background: #000;
+    border-bottom: 1px solid #1a1a1a;
+    flex-shrink: 0;
+    gap: 12px;
+  }
+  #settings-header-title {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+  #settings-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  .settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .settings-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding-bottom: 6px;
+    border-bottom: 1px solid #1f292a;
+  }
+  .settings-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .settings-row-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .settings-row-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  #open-about-blank-btn {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-dim);
+    color: #fff;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #open-about-blank-btn:hover { border-color: var(--border-hover); }
+  #open-about-blank-btn:focus, #open-about-blank-btn:active, #open-about-blank-btn:focus-visible { outline: none; box-shadow: none; }
+
+  /* Hue Slider */
+  #theme-hue-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 12px;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(to right,
+      hsl(0,80%,55%), hsl(30,80%,55%), hsl(60,80%,55%), hsl(90,80%,55%),
+      hsl(120,80%,55%), hsl(150,80%,55%), hsl(180,80%,55%), hsl(210,80%,55%),
+      hsl(240,80%,55%), hsl(270,80%,55%), hsl(300,80%,55%), hsl(330,80%,55%),
+      hsl(360,80%,55%));
+    border: 2px solid var(--border-dim);
+  }
+  #theme-hue-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #000;
+    box-shadow: 0 0 6px rgba(0,0,0,0.6);
+    cursor: pointer;
+  }
+  #theme-hue-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #000;
+    box-shadow: 0 0 6px rgba(0,0,0,0.6);
+    cursor: pointer;
+  }
+  #theme-hue-preview {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 4px;
+  }
+  #theme-hue-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 2px solid var(--border-dim);
+    flex-shrink: 0;
+  }
+  #theme-hue-value {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-family: monospace;
+  }
+
+  /* Panic Key */
+  #panic-key-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  #panic-key-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-dim);
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 15px;
+    color: #fff;
+    min-width: 48px;
+    text-align: center;
+  }
+  #panic-key-btn {
+    padding: 6px 16px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-dim);
+    color: #fff;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  #panic-key-btn:hover { border-color: var(--border-hover); transform: translateY(-1px); box-shadow: none; }
+  #panic-key-btn:focus, #panic-key-btn:active, #panic-key-btn:focus-visible { outline: none; box-shadow: none; }
+  #panic-key-btn.listening {
+    border-color: var(--border-dim);
+    color: #fff;
+    background: var(--card-bg);
+    box-shadow: none;
+    animation: none;
+  }
+  #panic-key-clear {
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: transparent;
+    border: 2px solid rgba(255,80,80,0.3);
+    color: #ff8b8b;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  #panic-key-clear:hover { border-color: rgba(255,80,80,0.7); }
+
+  /* Page Title */
+  #page-title-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-dim);
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #page-title-input:focus {
+    border-color: var(--border-hover);
+  }
+  #page-title-input::placeholder {
+    color: var(--text-dim);
+  }
+  #page-title-save {
+    align-self: flex-start;
+    padding: 8px 20px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-dim);
+    color: #fff;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  #page-title-save:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+  #page-title-feedback {
+    font-size: 12px;
+    color: #fff;
+    min-height: 16px;
+    transition: opacity 0.3s;
   }
 </style>
 
@@ -330,16 +592,14 @@
 </head>
 <body>
 
-<!-- Preloader -->
+
 <div id="site-preloader" style="position:fixed;inset:0;z-index:99999;background:#000;">
   <div id="preload-status" style="color:#fff;padding:10px;font-family:monospace;font-size:13px;"></div>
 </div>
 
 <script>
-
   window.GAMES_API = 'https://masculine-avatar-factual.ngrok-free.dev';
 </script>
-
 
 <script>
 window.__cachedGameList = [
@@ -636,7 +896,6 @@ window.__cachedGameList = [
     img.onload = img.onerror = function() { log('loading image ' + (++imgDone) + '/' + urls.length); tryDone(); };
     img.src = u;
   });
-  // Game list is inlined — resolve immediately from cache
   (window.__cachedGameList
     ? Promise.resolve(window.__cachedGameList)
     : fetchGameList()
@@ -649,7 +908,6 @@ window.__cachedGameList = [
   }).catch(function(){ log('loading cards failed'); finished = true; tryDone(); });
 })();
 
-// Tries games server first, falls back to main server.
 function fetchGameList() {
   var primary  = (window.GAMES_API || '') + '/games/list';
   var fallback = '/games/list';
@@ -662,55 +920,30 @@ function fetchGameList() {
 }
 </script>
 
-<style>
-  .nav-icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: #1C2526;
-    border: 2px solid rgba(148,163,184,0.16);
-    cursor: pointer;
-    transition: border-color 0.2s, transform 0.2s;
-    text-decoration: none;
-    flex-shrink: 0;
-  }
-  .nav-icon-btn:hover {
-    border-color: rgba(148,163,184,0.5);
-    transform: translateY(-2px);
-  }
-  .nav-icon-btn img {
-    width: 26px;
-    height: 26px;
-    object-fit: contain;
-  }
-</style>
-
 <header class="site-header" style="background:#000000;color:white;padding:16px 20px;">
   <div style="display:flex;align-items:center;gap:14px;max-width:1400px;margin:0 auto;padding:0 20px;">
     <img src="https://ik.imagekit.io/rckdebdbt/GAMESsdaads%20(3).png" alt="4Games" class="site-logo">
 
-    
     <a href="https://discord.4games.net/" class="nav-icon-btn" title="Discord Server">
       <img src="https://ik.imagekit.io/rckdebdbt/Copy%20of%20PARTS%20DISTRIBUTION%20CENTER%20(2).png" alt="Discord">
     </a>
 
-    
     <a href="https://discord.4games.net/" class="nav-icon-btn" title="More Links">
       <img src="https://ik.imagekit.io/rckdebdbt/links.png" alt="Links">
     </a>
 
-    
+    <button class="nav-icon-btn" id="settings-open-btn" onclick="settingsOpen()" title="Settings">
+      <img src="https://ik.imagekit.io/rckdebdbt/newtab%20(4).png" alt="Settings">
+    </button>
+
     <a href="https://levitator-lagging-dynamic.ngrok-free.dev//ai.html" class="nav-icon-btn" title="AI">
       <img src="https://ik.imagekit.io/rckdebdbt/ai.png" alt="AI">
     </a>
 
-   
     <a href="https://levitator-lagging-dynamic.ngrok-free.dev//chat.html" class="nav-icon-btn" title="Chat">
       <img src="https://ik.imagekit.io/rckdebdbt/chat.png" alt="Chat">
     </a>
+
 
     <input type="text" id="searchInput" placeholder="Search games..." style="padding:8px 14px;font-size:14px;border-radius:10px;border:none;background:#1a1a1a;color:white;outline:none;flex:1;max-width:260px;">
 
@@ -729,6 +962,7 @@ function fetchGameList() {
   <p>4games | discord.4games.net | press alt f4 for free games</p>
 </footer>
 
+
 <div id="fg-viewer">
   <div id="fg-header">
     <span id="fg-title">game title</span>
@@ -739,7 +973,6 @@ function fetchGameList() {
       <button class="fg-btn" onclick="fgReload()" title="Reload Game">
         <img src="https://ik.imagekit.io/rckdebdbt/reload.png" alt="Reload" onerror="this.style.display='none';this.parentNode.dataset.fallback='↺';this.parentNode.style.fontSize='20px';this.parentNode.style.color='#94a3b8';">
       </button>
-
       <button class="fg-btn" id="fg-console-btn" onclick="fgToggleConsole()" title="Developer Console" aria-label="Toggle developer console">
         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 17 10 11 4 5'/%3E%3Cline x1='12' y1='19' x2='20' y2='19'/%3E%3C/svg%3E" alt="Console">
       </button>
@@ -771,6 +1004,69 @@ function fetchGameList() {
   </div>
 </div>
 
+
+<div id="settings-panel" aria-hidden="true">
+  <div id="settings-header">
+    <span id="settings-header-title">Settings</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="fg-btn" onclick="settingsClose()" title="Close Settings">
+        <img src="https://ik.imagekit.io/rckdebdbt/newtab%20(2).png" alt="Close"
+          onerror="this.style.display='none';this.parentNode.textContent='✕';this.parentNode.style.fontSize='18px';this.parentNode.style.color='#94a3b8';">
+      </button>
+    </div>
+  </div>
+
+  <div id="settings-body">
+
+    
+    <div class="settings-section">
+      <div class="settings-row">
+        <div class="settings-row-title">accent color</div>
+        <div class="settings-row-desc">set accent color for button. make it look badass</div>
+        <input type="range" id="theme-hue-slider" min="0" max="360" value="186">
+        <div id="theme-hue-preview">
+          <div id="theme-hue-swatch"></div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="settings-section">
+      <div class="settings-row">
+        <div class="settings-row-title">panic key</div>
+        <div class="settings-row-desc">panic key press that key to change tab instantly.</div>
+        <input type="url" id="panic-key-destination" placeholder="https://www.google.com" value="https://www.google.com" style="width:100%;box-sizing:border-box;padding:10px 14px;background:var(--card-bg);border:2px solid var(--border-dim);border-radius:10px;color:#fff;font-family:'Fredoka',sans-serif;font-size:15px;outline:none;">
+        <div id="panic-key-display">
+          <span id="panic-key-badge">—</span>
+          <button id="panic-key-btn" onclick="panicKeyListen()">Set Key</button>
+          <button id="panic-key-clear" onclick="panicKeyClear()">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="settings-section">
+      <div class="settings-row">
+        <div class="settings-row-title">change page title</div>
+        <div class="settings-row-desc">tab cloak essentially. change page title name </div>
+        <input type="text" id="page-title-input" placeholder="e.g. Google Classroom" maxlength="120">
+        <button id="page-title-save" onclick="pageTitleSave()">Apply Title</button>
+        <div id="page-title-feedback"></div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-row">
+        <div class="settings-row-title">open in blank</div>
+        <div class="settings-row-desc">opens game site in about blank :3</div>
+        <button id="open-about-blank-btn" onclick="openCurrentPageInBlank()">Open Page</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
 <script>
 (function () {
   var FAVS_KEY = '4g_favourites';
@@ -780,27 +1076,17 @@ function fetchGameList() {
     try {
       var stored = JSON.parse(window.localStorage.getItem(FAVS_KEY));
       if (Array.isArray(stored)) memoryFavs = stored;
-    } catch (e) {
-      // Keep the favorite system usable even if storage is blocked.
-    }
+    } catch (e) {}
     return memoryFavs.slice();
   }
   function saveFavs(arr) {
     memoryFavs = arr.slice();
     try { window.localStorage.setItem(FAVS_KEY, JSON.stringify(memoryFavs)); }
-    catch (e) { /* In-memory favorites still work for this page session. */ }
+    catch (e) {}
   }
-  function isFav(title) {
-    return getFavs().includes(title);
-  }
-  function addFav(title) {
-    var favs = getFavs();
-    if (!favs.includes(title)) { favs.push(title); saveFavs(favs); }
-  }
-  function removeFav(title) {
-    saveFavs(getFavs().filter(function(f){ return f !== title; }));
-  }
-
+  function isFav(title) { return getFavs().includes(title); }
+  function addFav(title) { var favs = getFavs(); if (!favs.includes(title)) { favs.push(title); saveFavs(favs); } }
+  function removeFav(title) { saveFavs(getFavs().filter(function(f){ return f !== title; })); }
 
   window.fgFavUtils = { isFav: isFav, getFavs: getFavs };
 
@@ -828,7 +1114,6 @@ function fetchGameList() {
 
   var currentGameUrl = '';
   var currentTitle   = '';
-  var gameMuted = false;
 
   function consoleLine(message, type) {
     var output = document.getElementById('fg-console-output');
@@ -848,29 +1133,21 @@ function fetchGameList() {
     if (isOpen) consoleLine('console loaded 2');
   };
 
-
   function loadIntoIframe(url) {
-    // Cloudinary raw files come with Content-Disposition: attachment.
-    // Fetch as text, inject <base href> so Ruffle/WASM/relative assets resolve,
-    // then load as a blob so the browser renders instead of downloading.
     if (/cloudinary\.com/i.test(url)) {
       fetch(url)
         .then(function(r) { return r.text(); })
         .then(function(html) {
           var base = '<base href="' + url + '">';
-          // Insert after <head> if present, otherwise prepend
           if (/<head[\s>]/i.test(html)) {
             html = html.replace(/(<head[^>]*>)/i, '$1' + base);
           } else {
             html = base + html;
           }
           var blob = new Blob([html], { type: 'text/html' });
-          var blobUrl = URL.createObjectURL(blob);
-          document.getElementById('fg-iframe').src = blobUrl;
+          document.getElementById('fg-iframe').src = URL.createObjectURL(blob);
         })
-        .catch(function() {
-          document.getElementById('fg-iframe').src = url;
-        });
+        .catch(function() { document.getElementById('fg-iframe').src = url; });
     } else {
       document.getElementById('fg-iframe').src = url;
     }
@@ -886,7 +1163,6 @@ function fetchGameList() {
     loadingOverlay.classList.remove('fade-out');
     loadingOverlay.style.display = 'flex';
     var loadingVideo = document.getElementById('fg-loading-video');
-    loadingStartedAt = Date.now();
     startLoadingIssueTimer();
     if (!loadingVideo.src) loadingVideo.src = loadingVideo.dataset.src;
     loadingVideo.currentTime = 0;
@@ -913,7 +1189,6 @@ function fetchGameList() {
     if (isFav(currentTitle)) removeFav(currentTitle);
     else addFav(currentTitle);
     updateFavBtn();
-
     document.querySelectorAll('.card').forEach(function(card) {
       var gt = card.querySelector('.game-title');
       if (gt && gt.textContent.trim() === currentTitle) {
@@ -929,7 +1204,6 @@ function fetchGameList() {
     loadingOverlay.classList.remove('fade-out');
     loadingOverlay.style.display = 'flex';
     var loadingVideo = document.getElementById('fg-loading-video');
-    loadingStartedAt = Date.now();
     startLoadingIssueTimer();
     if (!loadingVideo.src) loadingVideo.src = loadingVideo.dataset.src;
     loadingVideo.currentTime = 0;
@@ -941,7 +1215,7 @@ function fetchGameList() {
     if (currentGameUrl) window.open(currentGameUrl, '_blank');
   };
 
-    window.fgDownload = function() {
+  window.fgDownload = function() {
     var url = prompt('Enter a game URL to load:');
     if (!url || !url.trim()) return;
     url = url.trim();
@@ -953,7 +1227,6 @@ function fetchGameList() {
     consoleLine('Game iframe load event fired.');
     var loadingOverlay = document.getElementById('fg-loading');
     var loadingVideo = document.getElementById('fg-loading-video');
-    // The fade-out timer remains removed; hide on iframe load.
     clearTimeout(loadingIssueTimer);
     if (!document.getElementById('fg-viewer').classList.contains('open')) return;
     loadingOverlay.style.display = 'none';
@@ -968,46 +1241,213 @@ function fetchGameList() {
   document.addEventListener('click', function(e) {
     var link = e.target.closest('a[href]');
     if (!link) return;
-
     var href = link.getAttribute('href');
     if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
-
-    
     if (link.classList.contains('nav-icon-btn')) {
       e.preventDefault();
-      var headerTitle = link.getAttribute('title') || 'Game Menu';
-      fgOpen(href, headerTitle);
+      fgOpen(href, link.getAttribute('title') || 'Game Menu');
       return;
     }
-
-    
     if (href.startsWith('http')) {
       e.preventDefault();
       var title = 'Game';
       var card = link.closest('.card');
-      if (card) {
-        var gt = card.querySelector('.game-title');
-        if (gt) title = gt.textContent.trim();
-      }
+      if (card) { var gt = card.querySelector('.game-title'); if (gt) title = gt.textContent.trim(); }
       fgOpen(href, title);
       return;
     }
-
-    
     if (href.startsWith('/games/')) {
       e.preventDefault();
       var title = 'Game';
       var card = link.closest('.card');
-      if (card) {
-        var gt = card.querySelector('.game-title');
-        if (gt) title = gt.textContent.trim();
-      }
+      if (card) { var gt = card.querySelector('.game-title'); if (gt) title = gt.textContent.trim(); }
       fgOpen(href, title);
       return;
     }
   });
 })();
 </script>
+
+
+<script>
+(function () {
+  var SETTINGS_KEY = '4g_settings';
+
+  /* ── Load saved settings ── */
+  function loadSettings() {
+    try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; }
+    catch(e) { return {}; }
+  }
+  function saveSettings(obj) {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(obj)); } catch(e) {}
+  }
+
+  /* ── Apply theme hue to :root ── */
+  function applyHue(hue) {
+    document.documentElement.style.setProperty('--theme-hue', hue);
+    var swatch = document.getElementById('theme-hue-swatch');
+    if (swatch) swatch.style.background = 'hsl(' + hue + ',60%,40%)';
+  }
+
+  /* ── Theme slider ── */
+  var slider = document.getElementById('theme-hue-slider');
+  slider.addEventListener('input', function() {
+    var hue = parseInt(this.value, 10);
+    applyHue(hue);
+    var s = loadSettings(); s.themeHue = hue; saveSettings(s);
+  });
+
+  /* ── Panic key ── */
+  var panicKey = null;
+  var panicDestination = 'https://www.google.com';
+  var destinationInput = document.getElementById('panic-key-destination');
+  function savePanicDestination(finalize) {
+    if (!destinationInput) return;
+    var value = destinationInput.value.trim();
+    if (!value) {
+      if (finalize) {
+        value = 'https://www.google.com';
+        destinationInput.value = value;
+      } else { return; }
+    }
+    try {
+      var parsed = new URL(value);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') throw new Error('Invalid protocol');
+      panicDestination = parsed.href;
+      var settings = loadSettings();
+      settings.panicDestination = panicDestination;
+      saveSettings(settings);
+      if (finalize) destinationInput.value = panicDestination;
+    } catch (e) {
+      if (finalize) {
+        destinationInput.value = panicDestination || 'https://www.google.com';
+      }
+    }
+  }
+  if (destinationInput) {
+    destinationInput.addEventListener('input', function() { savePanicDestination(false); });
+    destinationInput.addEventListener('change', function() { savePanicDestination(true); });
+    destinationInput.addEventListener('blur', function() { savePanicDestination(true); });
+  }
+  var listenMode = false;
+
+  function updatePanicBadge() {
+    var badge = document.getElementById('panic-key-badge');
+    var btn   = document.getElementById('panic-key-btn');
+    if (!badge || !btn) return;
+    badge.textContent = panicKey || '\u2014';
+    btn.textContent   = listenMode ? 'Press any key...' : 'Set Key';
+    btn.classList.toggle('listening', listenMode);
+  }
+
+  window.panicKeyListen = function() {
+    listenMode = true;
+    updatePanicBadge();
+  };
+
+  window.panicKeyClear = function() {
+    panicKey  = null;
+    listenMode = false;
+    updatePanicBadge();
+    var s = loadSettings(); delete s.panicKey; saveSettings(s);
+  };
+
+  document.addEventListener('keydown', function(e) {
+    /* Settings panel escape */
+    if (e.key === 'Escape' && document.getElementById('settings-panel').classList.contains('open')) {
+      settingsClose();
+      return;
+    }
+
+    /* Capture new panic key */
+    if (listenMode) {
+      e.preventDefault();
+      panicKey   = e.key;
+      listenMode = false;
+      updatePanicBadge();
+      var s = loadSettings(); s.panicKey = panicKey; saveSettings(s);
+      return;
+    }
+
+    /* Don't trigger the panic key while editing a field or using a control. */
+    var target = e.target;
+    var tag = target && target.tagName ? target.tagName.toLowerCase() : '';
+    if (tag === 'input' || tag === 'textarea' || tag === 'select' || (target && target.isContentEditable)) return;
+
+    /* Fire panic key */
+    if (panicKey && e.key === panicKey) {
+      window.location.href = panicDestination || 'https://www.google.com';
+    }
+  });
+
+  /* ── Page title ── */
+  window.pageTitleSave = function() {
+    var val = document.getElementById('page-title-input').value.trim();
+    document.title = val || '4Math Tutoring Center';
+    var s = loadSettings(); s.pageTitle = val; saveSettings(s);
+    var fb = document.getElementById('page-title-feedback');
+    fb.textContent = val ? 'Title set to "' + val + '"' : 'Title reset to default.';
+    setTimeout(function() { fb.textContent = ''; }, 3000);
+  };
+
+  window.openCurrentPageInBlank = function() {
+    var blankWindow = window.open('about:blank', '_blank');
+    if (!blankWindow) { alert('Pop-up blocked. Allow pop-ups for this site and try again.'); return; }
+    try {
+      blankWindow.document.open();
+      blankWindow.document.write('<!doctype html>' + document.documentElement.outerHTML);
+      blankWindow.document.close();
+    } catch (e) {
+      blankWindow.location.href = 'about:blank';
+      alert('The browser prevented copying this page into about:blank.');
+    }
+  };
+
+  /* ── Open / close settings panel ── */
+  window.settingsOpen = function() {
+    document.getElementById('settings-panel').classList.add('open');
+    document.getElementById('settings-panel').setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+  window.settingsClose = function() {
+    document.getElementById('settings-panel').classList.remove('open');
+    document.getElementById('settings-panel').setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
+  /* ── Restore on load ── */
+  var saved = loadSettings();
+
+  if (saved.themeHue !== undefined) {
+    slider.value = saved.themeHue;
+    applyHue(saved.themeHue);
+  } else {
+    applyHue(186);
+  }
+
+  if (saved.panicKey) {
+    panicKey = saved.panicKey;
+    updatePanicBadge();
+  }
+
+  if (saved.panicDestination) {
+    try {
+      var parsedDestination = new URL(saved.panicDestination, window.location.href);
+      if (parsedDestination.protocol === 'http:' || parsedDestination.protocol === 'https:') {
+        panicDestination = parsedDestination.href;
+      }
+    } catch (e) {}
+  }
+  if (destinationInput) destinationInput.value = panicDestination;
+
+  if (saved.pageTitle) {
+    document.title = saved.pageTitle;
+    document.getElementById('page-title-input').value = saved.pageTitle;
+  }
+
+})();
+</script>
+
 
 <script>
 (function() {
@@ -1042,7 +1482,6 @@ function fetchGameList() {
     allCards.forEach(function(card) { container.appendChild(card); });
   }
 
-  
   window.fgResortGrid = sortCards;
 
   var BASE_URL = 'https://masculine-avatar-factual.ngrok-free.dev';
